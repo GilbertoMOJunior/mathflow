@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "MathUniplac",
+    "slug": "mathuniplac",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "mathuniplac",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.edu.uniplac.mathuniplac"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#185FA5"
+      },
+      "package": "br.edu.uniplac.mathuniplac"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"]
+  }
+}

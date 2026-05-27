@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -rf node_modules package-lock.json)",
+      "Bash(npm install *)",
+      "Bash(cmd.exe /c \"rmdir /s /q node_modules 2>nul & del /q package-lock.json 2>nul & npm install --no-audit --no-fund\")",
+      "PowerShell(Get-Command *)",
+      "PowerShell(Get-ChildItem C:\\\\ -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -match 'nvm|node' } | Select-Object FullName; Write-Host '---'; Get-ChildItem 'C:\\\\Users\\\\Gilberto\\\\AppData\\\\Roaming\\\\npm' -ErrorAction SilentlyContinue | Select-Object Name; Write-Host '---'; where.exe node 2>&1; Write-Host '---'; where.exe npm 2>&1)",
+      "PowerShell(npm *)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell($env:Path = 'C:\\\\Users\\\\Gilberto\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\node\\\\bin;' + $env:Path; npx tsc --noEmit 2>&1 | Select-Object -Last 80)",
+      "PowerShell(Tee-Object *)",
+      "PowerShell(gh *)",
+      "PowerShell(git config *)",
+      "PowerShell(git *)"
+    ]
+  }
+}
