@@ -29,9 +29,12 @@ app/
   _layout.tsx              # raiz: Stack + SafeAreaProvider + GestureHandlerRoot
   (tabs)/
     _layout.tsx            # tabs com TabBar custom (Estudar elevada)
-    index.tsx              # Início: resumo + Progresso + Próximos conteúdos
+    index.tsx              # Início: resumo + Progresso + Favoritos + Próximos
+    conteudos.tsx          # tab: navega disciplinas/conteúdos, favorita inline
     estudar.tsx            # seleção de conteúdo com filtro por fase
     perfil.tsx             # perfil + heatmap + histórico Você + matérias
+  conteudo/
+    [id].tsx               # detalhes do conteúdo: status, stats, favoritar, iniciar sessão
   estudar/
     sessao.tsx             # flashcards com cronômetro pílula e encerrar inline
     resumo.tsx             # salva RegistroEstudo no store
@@ -46,7 +49,7 @@ components/
 data/
   grade.ts                 # grade completa 8 fases (Disciplina > Conteudo > FlashCard)
 store/
-  useAppStore.ts           # Zustand: usuario, interesses, registros
+  useAppStore.ts           # Zustand: usuario, interesses, favoritos, registros
 lib/
   format.ts                # formatTempo, formatDuracao, formatRelativo, iniciais, corPorId
   progresso.ts             # classificarConteudos + gerarSugestoes (SRS)
@@ -76,11 +79,20 @@ Ordenação por prioridade (revisão atrasada > andamento antigo > novo).
 
 ### Persistência (store/useAppStore.ts)
 - Chave AsyncStorage: `mathflow-store`
-- `partialize` salva `usuario`, `interesses`, `registros` (não persiste estado derivado).
+- `partialize` salva `usuario`, `interesses`, `favoritos`, `registros` (não persiste estado derivado).
 - `addRegistro` prepende — `registros` está sempre em ordem do mais novo ao mais antigo. Não chame `.sort()` redundante.
+- `favoritos: string[]` armazena `conteudoId`s. `toggleFavorito(id)` alterna. Home renderiza a seção "Favoritos" só quando há itens.
+
+### Navegação Conteúdos vs Estudar
+- Tab **Conteúdos** (`(tabs)/conteudos.tsx`): exploração — clique no item abre `/conteudo/[id]` (detalhes), nunca inicia sessão direto. Estrela inline favorita sem navegar.
+- Tela de **detalhes** (`conteudo/[id].tsx`): mostra status, sessões, tempo total, lista de cards e CTA "Iniciar sessão" no rodapé.
+- Tab **Estudar** e cards de "Próximos conteúdos" da Home seguem indo direto para `/estudar/sessao` (fluxo Anki rápido).
 
 ### Interesses padrão
-`['d-1-1', 'd-2-1', 'd-2-2']` (Cálculo I, Cálculo II, Álgebra Linear I). Telas que filtram por interesses devem cair para "tudo" quando o array estiver vazio.
+`['d-1-1', 'd-2-4', 'd-3-2']` (Fundamentos da Matemática, Introdução ao Cálculo, Cálculo I). Telas que filtram por interesses devem cair para "tudo" quando o array estiver vazio.
+
+### Grade real (data/grade.ts)
+Grade oficial do curso de Matemática da Uniplac (8 fases). Disciplinas e conteúdos batem com o currículo real — não invente disciplinas novas sem confirmar. Há disciplinas não-matemáticas (Profissão Docente, Libras, Cultura/Diferença/Cidadania, PPP I/II/III etc.) — flashcards delas devem refletir o conteúdo da área, não forçar matemática.
 
 ### UI
 - Tab bar custom: ícone Estudar em quadrado azul 44x44 elevado `marginTop: -14`. Não usar a tab bar padrão.

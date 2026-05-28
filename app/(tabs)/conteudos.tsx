@@ -3,18 +3,29 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { grade, type Conteudo, type Disciplina } from '../data/grade';
+import { grade, type Conteudo, type Disciplina } from '../../data/grade';
 import {
   classificarConteudos,
   type StatusConteudo,
-} from '../lib/progresso';
-import { useAppStore } from '../store/useAppStore';
+} from '../../lib/progresso';
+import { useAppStore } from '../../store/useAppStore';
 
 const fases = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 export default function ConteudosScreen() {
   const registros = useAppStore((s) => s.registros);
+  const favoritos = useAppStore((s) => s.favoritos);
+  const toggleFavorito = useAppStore((s) => s.toggleFavorito);
   const [faseFiltro, setFaseFiltro] = useState<number | null>(null);
+  const [minimizadas, setMinimizadas] = useState<Set<string>>(new Set());
+
+  const toggleMinimizada = (id: string) =>
+    setMinimizadas((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const statusPorConteudo = useMemo(() => {
     const m = new Map<string, StatusConteudo>();
@@ -24,23 +35,20 @@ export default function ConteudosScreen() {
     return m;
   }, [registros]);
 
+  const favoritosSet = useMemo(() => new Set(favoritos), [favoritos]);
+
   const disciplinasFiltradas = useMemo(() => {
     if (faseFiltro == null) return grade;
     return grade.filter((d) => d.fase === faseFiltro);
   }, [faseFiltro]);
 
   return (
-    <SafeAreaView className="flex-1 bg-surface-muted" edges={['top', 'bottom']}>
-      <View className="px-4 pt-4 flex-row items-center">
-        <Pressable onPress={() => router.back()} hitSlop={8} className="mr-2">
-          <Ionicons name="chevron-back" size={24} color="#185FA5" />
-        </Pressable>
-        <View className="flex-1">
-          <Text className="text-ink text-xl font-title">Conteúdos</Text>
-          <Text className="text-ink-muted text-xs mt-0.5">
-            Veja por matéria, filtre por fase
-          </Text>
-        </View>
+    <SafeAreaView className="flex-1 bg-surface-muted" edges={['top']}>
+      <View className="px-4 pt-4">
+        <Text className="text-ink text-2xl font-title">Conteúdos</Text>
+        <Text className="text-ink-muted text-sm mt-0.5">
+          Explore por matéria, favorite o que quiser revisitar
+        </Text>
       </View>
 
       <View style={{ height: 52 }}>
@@ -86,6 +94,10 @@ export default function ConteudosScreen() {
               key={d.id}
               disciplina={d}
               statusPorConteudo={statusPorConteudo}
+              favoritosSet={favoritosSet}
+              onToggleFavorito={toggleFavorito}
+              minimizada={minimizadas.has(d.id)}
+              onToggleMinimizada={() => toggleMinimizada(d.id)}
             />
           ))
         )}
@@ -97,9 +109,17 @@ export default function ConteudosScreen() {
 function GrupoDisciplina({
   disciplina,
   statusPorConteudo,
+  favoritosSet,
+  onToggleFavorito,
+  minimizada,
+  onToggleMinimizada,
 }: {
   disciplina: Disciplina;
   statusPorConteudo: Map<string, StatusConteudo>;
+  favoritosSet: Set<string>;
+  onToggleFavorito: (id: string) => void;
+  minimizada: boolean;
+  onToggleMinimizada: () => void;
 }) {
   const totalFlashcards = disciplina.conteudos.reduce(
     (s, c) => s + c.flashcards.length,
@@ -107,24 +127,47 @@ function GrupoDisciplina({
   );
   return (
     <View>
-      <View className="flex-row items-baseline justify-between mb-2 px-1">
-        <Text className="text-ink text-base font-title flex-1" numberOfLines={1}>
+      <Pressable
+        onPress={onToggleMinimizada}
+        hitSlop={6}
+        className="flex-row items-center mb-2 px-1"
+        accessibilityRole="button"
+        accessibilityLabel={
+          minimizada
+            ? `Expandir ${disciplina.nome}`
+            : `Minimizar ${disciplina.nome}`
+        }
+      >
+        <Ionicons
+          name={minimizada ? 'chevron-forward' : 'chevron-down'}
+          size={16}
+          color="#6B7280"
+        />
+        <Text
+          className="text-ink text-base font-title flex-1 ml-1"
+          numberOfLines={1}
+        >
           {disciplina.nome}
         </Text>
         <Text className="text-ink-light text-[10px] ml-2">
-          Fase {disciplina.fase} · {totalFlashcards} cards
+          Fase {disciplina.fase} · {disciplina.conteudos.length} conteúdos ·{' '}
+          {totalFlashcards} cards
         </Text>
-      </View>
-      <View className="bg-white border border-surface-border rounded-2xl overflow-hidden">
-        {disciplina.conteudos.map((c, idx) => (
-          <ItemConteudo
-            key={c.id}
-            conteudo={c}
-            status={statusPorConteudo.get(c.id) ?? 'nao-iniciado'}
-            mostrarDivisor={idx < disciplina.conteudos.length - 1}
-          />
-        ))}
-      </View>
+      </Pressable>
+      {minimizada ? null : (
+        <View className="bg-white border border-surface-border rounded-2xl overflow-hidden">
+          {disciplina.conteudos.map((c, idx) => (
+            <ItemConteudo
+              key={c.id}
+              conteudo={c}
+              status={statusPorConteudo.get(c.id) ?? 'nao-iniciado'}
+              favorito={favoritosSet.has(c.id)}
+              onToggleFavorito={() => onToggleFavorito(c.id)}
+              mostrarDivisor={idx < disciplina.conteudos.length - 1}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -141,10 +184,14 @@ const badgeMeta: Record<
 function ItemConteudo({
   conteudo,
   status,
+  favorito,
+  onToggleFavorito,
   mostrarDivisor,
 }: {
   conteudo: Conteudo;
   status: StatusConteudo;
+  favorito: boolean;
+  onToggleFavorito: () => void;
   mostrarDivisor: boolean;
 }) {
   const b = badgeMeta[status];
@@ -152,8 +199,8 @@ function ItemConteudo({
     <Pressable
       onPress={() =>
         router.push({
-          pathname: '/estudar/sessao',
-          params: { conteudoId: conteudo.id },
+          pathname: '/conteudo/[id]',
+          params: { id: conteudo.id },
         })
       }
       className="p-3 flex-row items-center"
@@ -176,6 +223,18 @@ function ItemConteudo({
           </Text>
         </View>
       </View>
+      <Pressable
+        onPress={onToggleFavorito}
+        hitSlop={10}
+        className="px-2 py-1"
+        accessibilityLabel={favorito ? 'Remover dos favoritos' : 'Favoritar'}
+      >
+        <Ionicons
+          name={favorito ? 'star' : 'star-outline'}
+          size={20}
+          color={favorito ? '#185FA5' : '#9CA3AF'}
+        />
+      </Pressable>
       <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
       {mostrarDivisor ? (
         <View

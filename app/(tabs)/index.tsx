@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { grade } from '../../data/grade';
 import { formatDuracao, formatRelativo } from '../../lib/format';
 import {
   classificarConteudos,
@@ -14,6 +15,7 @@ import { useAppStore } from '../../store/useAppStore';
 export default function InicioScreen() {
   const registros = useAppStore((s) => s.registros);
   const interesses = useAppStore((s) => s.interesses);
+  const favoritos = useAppStore((s) => s.favoritos);
   const usuario = useAppStore((s) => s.usuario);
 
   const { minutosSemana, ultimaIso } = useMemo(() => {
@@ -44,6 +46,18 @@ export default function InicioScreen() {
   }, [lista]);
 
   const sugestoes = useMemo(() => gerarSugestoes(lista, 5), [lista]);
+
+  const favoritosResolvidos = useMemo(() => {
+    if (favoritos.length === 0) return [];
+    const fav = new Set(favoritos);
+    const itens: { disciplina: typeof grade[number]; conteudo: typeof grade[number]['conteudos'][number] }[] = [];
+    for (const d of grade) {
+      for (const c of d.conteudos) {
+        if (fav.has(c.id)) itens.push({ disciplina: d, conteudo: c });
+      }
+    }
+    return itens;
+  }, [favoritos]);
 
   return (
     <SafeAreaView className="flex-1 bg-surface-muted" edges={['top']}>
@@ -77,6 +91,35 @@ export default function InicioScreen() {
         <View className="px-4">
           <Progresso contagens={contagens} />
         </View>
+
+        {favoritosResolvidos.length > 0 ? (
+          <>
+            <SecaoLabel
+              titulo="Favoritos"
+              acao={{
+                texto: 'Ver todos',
+                onPress: () => router.push('/conteudos'),
+              }}
+            />
+            <View className="px-4 gap-2">
+              {favoritosResolvidos.slice(0, 5).map((f) => (
+                <FavoritoCard
+                  key={f.conteudo.id}
+                  disciplinaNome={f.disciplina.nome}
+                  fase={f.disciplina.fase}
+                  titulo={f.conteudo.titulo}
+                  cards={f.conteudo.flashcards.length}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/conteudo/[id]',
+                      params: { id: f.conteudo.id },
+                    })
+                  }
+                />
+              ))}
+            </View>
+          </>
+        ) : null}
 
         <SecaoLabel
           titulo="Próximos conteúdos"
@@ -218,6 +261,44 @@ const iconePorTipo: Record<
   continuar: { nome: 'play-outline', cor: '#378ADD', bg: '#EDF4FC' },
   comecar: { nome: 'sparkles-outline', cor: '#0F4377', bg: '#F4F5F7' },
 };
+
+function FavoritoCard({
+  disciplinaNome,
+  fase,
+  titulo,
+  cards,
+  onPress,
+}: {
+  disciplinaNome: string;
+  fase: number;
+  titulo: string;
+  cards: number;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className="bg-white border border-surface-border rounded-2xl p-3 flex-row items-center"
+    >
+      <View
+        style={{ backgroundColor: '#EDF4FC' }}
+        className="w-9 h-9 rounded-full items-center justify-center mr-3"
+      >
+        <Ionicons name="star" size={16} color="#185FA5" />
+      </View>
+      <View className="flex-1">
+        <Text className="text-ink-muted text-[11px]" numberOfLines={1}>
+          {disciplinaNome} · Fase {fase}
+        </Text>
+        <Text className="text-ink text-sm font-title mt-0.5" numberOfLines={1}>
+          {titulo}
+        </Text>
+        <Text className="text-ink-light text-[10px] mt-0.5">{cards} cards</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+    </Pressable>
+  );
+}
 
 function SugestaoCard({ sug }: { sug: Sugestao }) {
   const ic = iconePorTipo[sug.tipo];

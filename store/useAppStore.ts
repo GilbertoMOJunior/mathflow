@@ -12,9 +12,11 @@ type Usuario = {
 interface AppState {
   usuario: Usuario;
   interesses: string[];
+  favoritos: string[];
   registros: RegistroEstudo[];
   setUsuario: (patch: Partial<Usuario>) => void;
   toggleInteresse: (disciplinaId: string) => void;
+  toggleFavorito: (conteudoId: string) => void;
   addRegistro: (registro: Omit<RegistroEstudo, 'id' | 'userId' | 'timestamp'>) => void;
 }
 
@@ -29,7 +31,8 @@ export const useAppStore = create<AppState>()(
         nome: 'Estudante Uniplac',
         fase: 2,
       },
-      interesses: ['d-1-1', 'd-2-1', 'd-2-2'],
+      interesses: ['d-1-1', 'd-2-4', 'd-3-2'],
+      favoritos: [],
       registros: [],
       setUsuario: (patch) =>
         set((state) => ({ usuario: { ...state.usuario, ...patch } })),
@@ -40,6 +43,15 @@ export const useAppStore = create<AppState>()(
             interesses: ativo
               ? state.interesses.filter((id) => id !== disciplinaId)
               : [...state.interesses, disciplinaId],
+          };
+        }),
+      toggleFavorito: (conteudoId) =>
+        set((state) => {
+          const ativo = state.favoritos.includes(conteudoId);
+          return {
+            favoritos: ativo
+              ? state.favoritos.filter((id) => id !== conteudoId)
+              : [...state.favoritos, conteudoId],
           };
         }),
       addRegistro: (registro) =>
@@ -61,6 +73,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         usuario: state.usuario,
         interesses: state.interesses,
+        favoritos: state.favoritos,
         registros: state.registros,
       }),
     },
