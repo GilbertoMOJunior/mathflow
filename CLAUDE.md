@@ -1,0 +1,99 @@
+# MathFlow
+
+App mobile de flashcards para alunos do curso de Matemática da Uniplac (Universidade do Planalto Catarinense, Lages/SC). Metodologia: estudo espaçado no estilo Anki.
+
+## Stack
+
+- **Expo SDK 54** + Expo Router (file-based routing)
+- **React Native 0.81** + React 19
+- **TypeScript** estrito
+- **NativeWind v4** para estilos (Tailwind no RN)
+- **Zustand** + middleware `persist` em AsyncStorage para estado global
+- **React Native Reanimated 4** + worklets (flip 3D do card)
+
+## Comandos
+
+```bash
+npm install
+npx expo start -c      # -c limpa cache do Metro (necessário após mudar babel.config.js ou nativewind)
+npx tsc --noEmit       # typecheck
+npx expo export --platform android   # valida bundle sem rodar dispositivo
+```
+
+`gh` CLI fica em `C:\Program Files\GitHub CLI\gh.exe` (não está no PATH padrão do PowerShell). Node vem do nvm em `C:\Users\Gilberto\AppData\Roaming\npm\node_modules\node\bin\`.
+
+## Estrutura
+
+```
+app/
+  _layout.tsx              # raiz: Stack + SafeAreaProvider + GestureHandlerRoot
+  (tabs)/
+    _layout.tsx            # tabs com TabBar custom (Estudar elevada)
+    index.tsx              # Início: resumo + Progresso + Próximos conteúdos
+    estudar.tsx            # seleção de conteúdo com filtro por fase
+    perfil.tsx             # perfil + heatmap + histórico Você + matérias
+  estudar/
+    sessao.tsx             # flashcards com cronômetro pílula e encerrar inline
+    resumo.tsx             # salva RegistroEstudo no store
+  perfil/
+    gerenciar.tsx          # toggle de interesses agrupado por fase
+components/
+  TabBar.tsx               # tab bar custom, botão Estudar elevado (44x44, primary)
+  FlashCard.tsx            # flip 3D Reanimated, suporta texto e imagem
+  Cronometro.tsx           # pílula MM:SS, auto-start, tabular-nums
+  StudyHeatmap.tsx         # grid 26 semanas x 7 dias, 4 níveis SRS-like
+  RegistroCard.tsx         # item do histórico
+data/
+  grade.ts                 # grade completa 8 fases (Disciplina > Conteudo > FlashCard)
+store/
+  useAppStore.ts           # Zustand: usuario, interesses, registros
+lib/
+  format.ts                # formatTempo, formatDuracao, formatRelativo, iniciais, corPorId
+  progresso.ts             # classificarConteudos + gerarSugestoes (SRS)
+```
+
+## Convenções importantes
+
+### Status de conteúdo (lib/progresso.ts)
+- **não-iniciado**: zero registros
+- **em-andamento**: tem registro, mas nenhuma sessão viu todos os cards
+- **concluído**: ao menos UMA sessão viu todos os cards
+- Usa `Math.max(flashcardsRevisados)` entre sessões, **não soma** — sessões parciais repetidas não promovem para concluído.
+
+### Sugestões (Anki-style)
+Intervalos SRS: `[1, 3, 7, 14, 30]` dias por número de sessões.
+- `revisar` (concluído + intervalo vencido): mostra "Visto há Xd"
+- `continuar` (em-andamento): mostra "Visto há Xd"
+- `comecar` (não-iniciado): mostra "Nunca estudado"
+
+Ordenação por prioridade (revisão atrasada > andamento antigo > novo).
+
+### Cores (tailwind.config.js)
+- `primary` `#185FA5` (azul Uniplac) + tons `50` `100` `400` `500` `700`
+- `surface` muted `#F4F5F7`, border `#E5E7EB`
+- `ink` `#111827`, `ink-muted` `#6B7280`, `ink-light` `#9CA3AF`
+- Heatmap: 4 níveis `#E5E7EB` → `#B5D4F4` → `#378ADD` → `#185FA5`
+
+### Persistência (store/useAppStore.ts)
+- Chave AsyncStorage: `mathflow-store`
+- `partialize` salva `usuario`, `interesses`, `registros` (não persiste estado derivado).
+- `addRegistro` prepende — `registros` está sempre em ordem do mais novo ao mais antigo. Não chame `.sort()` redundante.
+
+### Interesses padrão
+`['d-1-1', 'd-2-1', 'd-2-2']` (Cálculo I, Cálculo II, Álgebra Linear I). Telas que filtram por interesses devem cair para "tudo" quando o array estiver vazio.
+
+### UI
+- Tab bar custom: ícone Estudar em quadrado azul 44x44 elevado `marginTop: -14`. Não usar a tab bar padrão.
+- Cronômetro: pílula discreta no topo da Sessão, nunca componente dominante.
+- Encerrar sessão: botão fino no canto inferior direito + confirmação inline (não modal).
+- ScrollView vertical em telas de lista precisa de `style={{ flex: 1 }}` ou layout quebra com muitos itens; ScrollView horizontal precisa de altura fixa no pai.
+
+## Patterns a evitar
+
+- Não somar `flashcardsRevisados` entre sessões para decidir status.
+- Não usar `font-mono` do Tailwind no RN — usar `fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace'` em style.
+- Não pinar `babel-preset-expo` errado: para SDK 54 é `~54.0.0` e o plugin de worklets é `react-native-worklets/plugin` (não mais `react-native-reanimated/plugin`).
+
+## Repositório
+
+GitHub: https://github.com/GilbertoMOJunior/mathflow (público, branch `main`)
