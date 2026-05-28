@@ -175,7 +175,7 @@ export const useAppStore = create<AppState>()(
         })),
     }),
     {
-      name: 'mathuniplac-store',
+      name: 'mathflow-store',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         usuario: state.usuario,
