@@ -50,27 +50,34 @@ export default function EstudarScreen() {
         </Text>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
-      >
-        <Chip
-          ativo={faseFiltro === null}
-          onPress={() => setFaseFiltro(null)}
-          label="Todas"
-        />
-        {fases.map((f) => (
+      <View style={{ height: 52 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+            alignItems: 'center',
+          }}
+        >
           <Chip
-            key={f}
-            ativo={faseFiltro === f}
-            onPress={() => setFaseFiltro(f)}
-            label={`Fase ${f}`}
+            ativo={faseFiltro === null}
+            onPress={() => setFaseFiltro(null)}
+            label="Todas"
           />
-        ))}
-      </ScrollView>
+          {fases.map((f) => (
+            <Chip
+              key={f}
+              ativo={faseFiltro === f}
+              onPress={() => setFaseFiltro(f)}
+              label={`Fase ${f}`}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
       <ScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32, gap: 8 }}
         showsVerticalScrollIndicator={false}
       >
