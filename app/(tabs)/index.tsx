@@ -78,7 +78,10 @@ export default function InicioScreen() {
           <Progresso contagens={contagens} />
         </View>
 
-        <SecaoLabel titulo="Próximos conteúdos" />
+        <SecaoLabel
+          titulo="Próximos conteúdos"
+          acao={{ texto: 'Ver todos', onPress: () => router.push('/conteudos') }}
+        />
         <View className="px-4 gap-2">
           {sugestoes.length === 0 ? (
             <View className="bg-white border border-surface-border rounded-2xl p-4">
@@ -117,12 +120,23 @@ function CardResumo({
   );
 }
 
-function SecaoLabel({ titulo }: { titulo: string }) {
+function SecaoLabel({
+  titulo,
+  acao,
+}: {
+  titulo: string;
+  acao?: { texto: string; onPress: () => void };
+}) {
   return (
-    <View className="px-4 mt-5 mb-2">
+    <View className="px-4 mt-5 mb-2 flex-row items-center justify-between">
       <Text className="text-ink-muted text-xs uppercase tracking-wider">
         {titulo}
       </Text>
+      {acao ? (
+        <Pressable onPress={acao.onPress} hitSlop={8}>
+          <Text className="text-primary text-xs font-title">{acao.texto}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
