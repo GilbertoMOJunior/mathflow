@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import RegistroCard from '../../components/RegistroCard';
 import StudyHeatmap from '../../components/StudyHeatmap';
 import { grade } from '../../data/grade';
 import { iniciais } from '../../lib/format';
@@ -21,7 +22,6 @@ export default function PerfilScreen() {
   const interesses = useAppStore((s) => s.interesses);
   const toggleInteresse = useAppStore((s) => s.toggleInteresse);
   const registros = useAppStore((s) => s.registros);
-  const feedColegas = useAppStore((s) => s.feedColegas);
 
   const [editandoNome, setEditandoNome] = useState(false);
   const [nomeRascunho, setNomeRascunho] = useState(usuario.nome);
@@ -54,11 +54,6 @@ export default function PerfilScreen() {
     }
     return { totalHoras, totalFlashcards, streak };
   }, [registros]);
-
-  const registrosHeatmap = useMemo(
-    () => [...registros, ...feedColegas.filter((r) => r.userId === usuario.id)],
-    [registros, feedColegas, usuario.id],
-  );
 
   return (
     <SafeAreaView className="flex-1 bg-surface-muted" edges={['top']}>
@@ -126,10 +121,30 @@ export default function PerfilScreen() {
 
         {/* 3. HEATMAP */}
         <View className="px-4 pt-3">
-          <StudyHeatmap registros={registrosHeatmap} />
+          <StudyHeatmap registros={registros} />
         </View>
 
-        {/* 4. MATÉRIAS ATIVAS */}
+        {/* 4. HISTÓRICO (Você) */}
+        <View className="px-4 pt-5">
+          <Text className="text-ink-muted text-xs uppercase tracking-wider mb-2">
+            Você
+          </Text>
+          {registros.length === 0 ? (
+            <View className="bg-white border border-surface-border rounded-2xl p-4">
+              <Text className="text-ink-muted text-sm">
+                Suas sessões aparecerão aqui.
+              </Text>
+            </View>
+          ) : (
+            <View className="gap-2">
+              {registros.slice(0, 10).map((r) => (
+                <RegistroCard key={r.id} registro={r} nomeAutor={usuario.nome} />
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* 5. MATÉRIAS ATIVAS */}
         <View className="px-4 pt-5">
           <Text className="text-ink-muted text-xs uppercase tracking-wider mb-2">
             Matérias ativas
@@ -166,7 +181,7 @@ export default function PerfilScreen() {
           )}
         </View>
 
-        {/* 5. GERENCIAR */}
+        {/* 6. GERENCIAR */}
         <View className="px-4 pt-3">
           <Pressable
             onPress={() => router.push('/perfil/gerenciar')}

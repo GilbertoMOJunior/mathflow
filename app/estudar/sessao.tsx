@@ -54,6 +54,7 @@ export default function SessaoScreen() {
   };
 
   const encerrar = () => {
+    const vistos = Math.max(revisados.size, idx + 1);
     router.replace({
       pathname: '/estudar/resumo',
       params: {
@@ -63,7 +64,7 @@ export default function SessaoScreen() {
         conteudoTitulo: conteudo.titulo,
         fase: String(disciplina.fase),
         tempoSegundos: String(tempoRef.current),
-        flashcardsRevisados: String(revisados.size || idx + 1),
+        flashcardsRevisados: String(vistos),
       },
     });
   };
