@@ -8,8 +8,9 @@ export default function TabsLayout() {
       screenOptions={{ headerShown: false }}
     >
       <Tabs.Screen name="index" options={{ title: 'Início' }} />
-      <Tabs.Screen name="conteudos" options={{ title: 'Conteúdos' }} />
+      <Tabs.Screen name="trilhas" options={{ title: 'Trilhas' }} />
       <Tabs.Screen name="estudar" options={{ title: 'Estudar' }} />
+      <Tabs.Screen name="conteudos" options={{ title: 'Conteúdos' }} />
       <Tabs.Screen name="perfil" options={{ title: 'Perfil' }} />
     </Tabs>
   );

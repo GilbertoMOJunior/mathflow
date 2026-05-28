@@ -28,13 +28,17 @@ npx expo export --platform android   # valida bundle sem rodar dispositivo
 app/
   _layout.tsx              # raiz: Stack + SafeAreaProvider + GestureHandlerRoot
   (tabs)/
-    _layout.tsx            # tabs com TabBar custom (Estudar elevada)
+    _layout.tsx            # tabs (ordem: Início, Trilhas, Estudar, Conteúdos, Perfil)
     index.tsx              # Início: resumo + Progresso + Favoritos + Próximos
-    conteudos.tsx          # tab: navega disciplinas/conteúdos, favorita inline
+    trilhas.tsx            # tab: trilhas por semestre + custom + criar nova
     estudar.tsx            # seleção de conteúdo com filtro por fase
+    conteudos.tsx          # tab: navega disciplinas/conteúdos, favorita inline
     perfil.tsx             # perfil + heatmap + histórico Você + matérias
   conteudo/
     [id].tsx               # detalhes do conteúdo: status, stats, favoritar, iniciar sessão
+  trilha/
+    [id].tsx               # detalhes da trilha: progresso, conteúdos, próximo conteúdo
+    nova.tsx               # criar trilha custom: nome + multi-select de conteúdos
   estudar/
     sessao.tsx             # flashcards com cronômetro pílula e encerrar inline
     resumo.tsx             # salva RegistroEstudo no store
@@ -49,7 +53,7 @@ components/
 data/
   grade.ts                 # grade completa 8 fases (Disciplina > Conteudo > FlashCard)
 store/
-  useAppStore.ts           # Zustand: usuario, interesses, favoritos, registros
+  useAppStore.ts           # Zustand: usuario, interesses, favoritos, trilhas, registros
 lib/
   format.ts                # formatTempo, formatDuracao, formatRelativo, iniciais, corPorId
   progresso.ts             # classificarConteudos + gerarSugestoes (SRS)
@@ -82,6 +86,13 @@ Ordenação por prioridade (revisão atrasada > andamento antigo > novo).
 - `partialize` salva `usuario`, `interesses`, `favoritos`, `registros` (não persiste estado derivado).
 - `addRegistro` prepende — `registros` está sempre em ordem do mais novo ao mais antigo. Não chame `.sort()` redundante.
 - `favoritos: string[]` armazena `conteudoId`s. `toggleFavorito(id)` alterna. Home renderiza a seção "Favoritos" só quando há itens.
+- `trilhas: TrilhaCustom[]` armazena trilhas criadas pelo usuário (`{ id, nome, conteudoIds, criadaEm }`). Trilhas de semestre (`t-fase-N`) NÃO ficam no store — são derivadas de `grade` em runtime.
+
+### Trilhas
+- IDs: `t-disc-{disciplinaId}` (matéria, read-only, com filtro de fase na lista) e `tc-…` (custom). Trilhas por matéria são derivadas de `grade` em runtime, não vão para o store.
+- `app/trilha/[id].tsx` resolve ambos via `resolverTrilha()`.
+- "Estudar próximo" pula para a sessão do primeiro conteúdo não-concluído da trilha. Quando todos concluídos, o CTA some.
+- Trilhas custom têm botão de remover no cabeçalho com confirmação via `Alert`.
 
 ### Navegação Conteúdos vs Estudar
 - Tab **Conteúdos** (`(tabs)/conteudos.tsx`): exploração — clique no item abre `/conteudo/[id]` (detalhes), nunca inicia sessão direto. Estrela inline favorita sem navegar.

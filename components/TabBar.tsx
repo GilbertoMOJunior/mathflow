@@ -5,15 +5,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const labels: Record<string, string> = {
   index: 'Início',
-  conteudos: 'Conteúdos',
+  trilhas: 'Trilhas',
   estudar: 'Estudar',
+  conteudos: 'Conteúdos',
   perfil: 'Perfil',
 };
 
 const icones: Record<string, keyof typeof Ionicons.glyphMap> = {
   index: 'home-outline',
-  conteudos: 'library-outline',
+  trilhas: 'map-outline',
   estudar: 'flash-outline',
+  conteudos: 'library-outline',
   perfil: 'person-outline',
 };
 
