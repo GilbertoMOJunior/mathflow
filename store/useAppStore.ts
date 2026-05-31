@@ -16,12 +16,20 @@ export type TrilhaCustom = {
   criadaEm: string;
 };
 
+export type ChatMensagem = {
+  id: string;
+  autor: 'aluno' | 'tutor';
+  texto: string;
+  timestamp: string;
+};
+
 interface AppState {
   usuario: Usuario;
   interesses: string[];
   favoritos: string[];
   trilhas: TrilhaCustom[];
   registros: RegistroEstudo[];
+  chatHistorico: Record<string, ChatMensagem[]>;
   setUsuario: (patch: Partial<Usuario>) => void;
   toggleInteresse: (disciplinaId: string) => void;
   toggleFavorito: (conteudoId: string) => void;
@@ -29,6 +37,11 @@ interface AppState {
   removeTrilha: (id: string) => void;
   updateTrilha: (id: string, patch: { nome?: string; conteudoIds?: string[] }) => void;
   addRegistro: (registro: Omit<RegistroEstudo, 'id' | 'userId' | 'timestamp'>) => void;
+  addChatMensagem: (
+    conteudoId: string,
+    msg: Omit<ChatMensagem, 'id' | 'timestamp'>,
+  ) => void;
+  limparChatConteudo: (conteudoId: string) => void;
 }
 
 const uid = () =>
@@ -46,6 +59,7 @@ export const useAppStore = create<AppState>()(
       favoritos: [],
       trilhas: [],
       registros: [],
+      chatHistorico: {},
       setUsuario: (patch) =>
         set((state) => ({ usuario: { ...state.usuario, ...patch } })),
       toggleInteresse: (disciplinaId) =>
@@ -103,6 +117,25 @@ export const useAppStore = create<AppState>()(
             ...state.registros,
           ],
         })),
+      addChatMensagem: (conteudoId, msg) =>
+        set((state) => {
+          const atual = state.chatHistorico[conteudoId] ?? [];
+          return {
+            chatHistorico: {
+              ...state.chatHistorico,
+              [conteudoId]: [
+                ...atual,
+                { ...msg, id: uid(), timestamp: new Date().toISOString() },
+              ],
+            },
+          };
+        }),
+      limparChatConteudo: (conteudoId) =>
+        set((state) => {
+          const novo = { ...state.chatHistorico };
+          delete novo[conteudoId];
+          return { chatHistorico: novo };
+        }),
     }),
     {
       name: 'mathflow-store',
@@ -113,6 +146,7 @@ export const useAppStore = create<AppState>()(
         favoritos: state.favoritos,
         trilhas: state.trilhas,
         registros: state.registros,
+        chatHistorico: state.chatHistorico,
       }),
     },
   ),

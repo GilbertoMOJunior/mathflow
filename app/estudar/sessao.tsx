@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ChatTutor from '../../components/ChatTutor';
 import Cronometro from '../../components/Cronometro';
 import FlashCard from '../../components/FlashCard';
 import { buscarConteudo } from '../../data/grade';
@@ -17,6 +18,7 @@ export default function SessaoScreen() {
   const [idx, setIdx] = useState(0);
   const [revisados, setRevisados] = useState<Set<string>>(new Set());
   const [confirmaEncerrar, setConfirmaEncerrar] = useState(false);
+  const [chatAberto, setChatAberto] = useState(false);
   const tempoRef = useRef(0);
 
   const onTick = useCallback((s: number) => {
@@ -189,6 +191,36 @@ export default function SessaoScreen() {
           </Pressable>
         </View>
       ) : null}
+
+      {/* FAB tutor IA */}
+      <Pressable
+        onPress={() => setChatAberto(true)}
+        hitSlop={6}
+        accessibilityLabel="Abrir tutor IA"
+        className="absolute bg-primary items-center justify-center"
+        style={{
+          left: 16,
+          bottom: 16,
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.18,
+          shadowRadius: 6,
+          elevation: 5,
+        }}
+      >
+        <Ionicons name="chatbubble-ellipses" size={22} color="#fff" />
+      </Pressable>
+
+      <ChatTutor
+        visivel={chatAberto}
+        onFechar={() => setChatAberto(false)}
+        conteudoId={conteudo.id}
+        disciplinaNome={disciplina.nome}
+        conteudoTitulo={conteudo.titulo}
+      />
     </SafeAreaView>
   );
 }
