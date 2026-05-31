@@ -33,7 +33,7 @@ app/
     trilhas.tsx            # tab: trilhas por semestre + custom + criar nova
     estudar.tsx            # seleção de conteúdo com filtro por fase
     conteudos.tsx          # tab: navega disciplinas/conteúdos, favorita inline
-    perfil.tsx             # perfil + heatmap + histórico Você + matérias
+    perfil.tsx             # perfil + heatmap + matérias
   conteudo/
     [id].tsx               # detalhes do conteúdo: status, stats, favoritar, iniciar sessão
   trilha/
@@ -49,7 +49,6 @@ components/
   FlashCard.tsx            # flip 3D Reanimated, suporta texto e imagem
   Cronometro.tsx           # pílula MM:SS, auto-start, tabular-nums
   StudyHeatmap.tsx         # grid 26 semanas x 7 dias, 4 níveis SRS-like
-  RegistroCard.tsx         # item do histórico
 data/
   grade.ts                 # grade completa 8 fases (Disciplina > Conteudo > FlashCard)
 store/

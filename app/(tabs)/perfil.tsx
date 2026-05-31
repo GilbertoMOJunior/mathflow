@@ -10,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import RegistroCard from '../../components/RegistroCard';
 import StudyHeatmap from '../../components/StudyHeatmap';
 import { grade } from '../../data/grade';
 import { iniciais } from '../../lib/format';
@@ -124,27 +123,7 @@ export default function PerfilScreen() {
           <StudyHeatmap registros={registros} />
         </View>
 
-        {/* 4. HISTÓRICO (Você) */}
-        <View className="px-4 pt-5">
-          <Text className="text-ink-muted text-xs uppercase tracking-wider mb-2">
-            Você
-          </Text>
-          {registros.length === 0 ? (
-            <View className="bg-white border border-surface-border rounded-2xl p-4">
-              <Text className="text-ink-muted text-sm">
-                Suas sessões aparecerão aqui.
-              </Text>
-            </View>
-          ) : (
-            <View className="gap-2">
-              {registros.slice(0, 10).map((r) => (
-                <RegistroCard key={r.id} registro={r} nomeAutor={usuario.nome} />
-              ))}
-            </View>
-          )}
-        </View>
-
-        {/* 5. MATÉRIAS ATIVAS */}
+        {/* 4. MATÉRIAS ATIVAS */}
         <View className="px-4 pt-5">
           <Text className="text-ink-muted text-xs uppercase tracking-wider mb-2">
             Matérias ativas
@@ -181,7 +160,7 @@ export default function PerfilScreen() {
           )}
         </View>
 
-        {/* 6. GERENCIAR */}
+        {/* 5. GERENCIAR */}
         <View className="px-4 pt-3">
           <Pressable
             onPress={() => router.push('/perfil/gerenciar')}
