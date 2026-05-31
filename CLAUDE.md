@@ -29,7 +29,7 @@ app/
   _layout.tsx              # raiz: Stack + SafeAreaProvider + GestureHandlerRoot
   (tabs)/
     _layout.tsx            # tabs (ordem: Início, Trilhas, Estudar, Conteúdos, Perfil)
-    index.tsx              # Início: resumo + Progresso + Favoritos + Próximos
+    index.tsx              # Início: resumo + Progresso + Continue de onde parou + Favoritos
     trilhas.tsx            # tab: trilhas por semestre + custom + criar nova
     estudar.tsx            # seleção de conteúdo com filtro por fase
     conteudos.tsx          # tab: navega disciplinas/conteúdos, favorita inline
@@ -55,7 +55,7 @@ store/
   useAppStore.ts           # Zustand: usuario, interesses, favoritos, trilhas, registros
 lib/
   format.ts                # formatTempo, formatDuracao, formatRelativo, iniciais, corPorId
-  progresso.ts             # classificarConteudos + gerarSugestoes (SRS)
+  progresso.ts             # classificarConteudos (status por conteúdo)
 ```
 
 ## Convenções importantes
@@ -66,13 +66,15 @@ lib/
 - **concluído**: ao menos UMA sessão viu todos os cards
 - Usa `Math.max(flashcardsRevisados)` entre sessões, **não soma** — sessões parciais repetidas não promovem para concluído.
 
-### Sugestões (Anki-style)
-Intervalos SRS: `[1, 3, 7, 14, 30]` dias por número de sessões.
-- `revisar` (concluído + intervalo vencido): mostra "Visto há Xd"
-- `continuar` (em-andamento): mostra "Visto há Xd"
-- `comecar` (não-iniciado): mostra "Nunca estudado"
+### Continue de onde parou (Home)
+Card destaque em primary na Home (`app/(tabs)/index.tsx`) que pega o registro mais recente, encontra a disciplina/trilha correspondente e, se ainda houver conteúdo não-concluído, mostra o próximo conteúdo da grade dessa matéria. Tap no card vai direto para a sessão; "Ver trilha" abre `/trilha/[id]`. Some quando não há registros ou todas as matérias tocadas estão completas.
 
-Ordenação por prioridade (revisão atrasada > andamento antigo > novo).
+### Progresso (Home)
+Card de Progresso na Home usa três buckets disjuntos sobre toda a grade (não filtra por `interesses`):
+- **Concluído**: conteúdos com status `concluido`.
+- **Em andamento**: conteúdos não-concluídos em disciplinas com ao menos 1 registro (cobre tanto `em-andamento` quanto `nao-iniciado` dentro de uma matéria iniciada).
+- **Não iniciado**: favoritos sem registro cuja disciplina ainda não foi tocada (favoritos que caem nos buckets acima não são recontados).
+Total exibido = soma dos três (foco atual do aluno), não o tamanho da grade inteira.
 
 ### Cores (tailwind.config.js)
 - `primary` `#185FA5` (azul Uniplac) + tons `50` `100` `400` `500` `700`
@@ -96,7 +98,7 @@ Ordenação por prioridade (revisão atrasada > andamento antigo > novo).
 ### Navegação Conteúdos vs Estudar
 - Tab **Conteúdos** (`(tabs)/conteudos.tsx`): exploração — clique no item abre `/conteudo/[id]` (detalhes), nunca inicia sessão direto. Estrela inline favorita sem navegar.
 - Tela de **detalhes** (`conteudo/[id].tsx`): mostra status, sessões, tempo total, lista de cards e CTA "Iniciar sessão" no rodapé.
-- Tab **Estudar** e cards de "Próximos conteúdos" da Home seguem indo direto para `/estudar/sessao` (fluxo Anki rápido).
+- Tab **Estudar** e o card "Continue de onde parou" da Home seguem indo direto para `/estudar/sessao` (fluxo Anki rápido).
 
 ### Interesses padrão
 `['d-1-1', 'd-2-4', 'd-3-2']` (Fundamentos da Matemática, Introdução ao Cálculo, Cálculo I). Telas que filtram por interesses devem cair para "tudo" quando o array estiver vazio.
