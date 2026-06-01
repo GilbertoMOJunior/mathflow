@@ -10,7 +10,10 @@ const fases = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 export default function EstudarScreen() {
   const interesses = useAppStore((s) => s.interesses);
+  const favoritos = useAppStore((s) => s.favoritos);
   const [faseFiltro, setFaseFiltro] = useState<number | null>(null);
+
+  const favoritosSet = useMemo(() => new Set(favoritos), [favoritos]);
 
   const conteudos = useMemo(() => {
     const lista: {
@@ -23,9 +26,12 @@ export default function EstudarScreen() {
     }[] = [];
     const usarInteresses = interesses.length > 0;
     for (const d of grade) {
-      if (usarInteresses && !interesses.includes(d.id)) continue;
-      if (faseFiltro != null && d.fase !== faseFiltro) continue;
+      if (faseFiltro != null) {
+        if (usarInteresses && !interesses.includes(d.id)) continue;
+        if (d.fase !== faseFiltro) continue;
+      }
       for (const c of d.conteudos) {
+        if (faseFiltro == null && !favoritosSet.has(c.id)) continue;
         lista.push({
           disciplinaId: d.id,
           disciplinaNome: d.nome,
@@ -37,16 +43,18 @@ export default function EstudarScreen() {
       }
     }
     return lista;
-  }, [interesses, faseFiltro]);
+  }, [interesses, faseFiltro, favoritosSet]);
 
   return (
     <SafeAreaView className="flex-1 bg-surface-muted" edges={['top']}>
       <View className="px-4 pt-4 pb-2">
         <Text className="text-ink text-2xl font-title">Estudar</Text>
         <Text className="text-ink-muted text-sm mt-0.5">
-          {interesses.length > 0
-            ? 'Conteúdos das suas matérias ativas'
-            : 'Todos os conteúdos da grade'}
+          {faseFiltro == null
+            ? 'Seus conteúdos favoritos'
+            : interesses.length > 0
+              ? 'Conteúdos das suas matérias ativas'
+              : 'Todos os conteúdos da grade'}
         </Text>
       </View>
 
@@ -63,7 +71,7 @@ export default function EstudarScreen() {
           <Chip
             ativo={faseFiltro === null}
             onPress={() => setFaseFiltro(null)}
-            label="Todas"
+            label="Favoritos"
           />
           {fases.map((f) => (
             <Chip
@@ -84,7 +92,9 @@ export default function EstudarScreen() {
         {conteudos.length === 0 ? (
           <View className="bg-white border border-surface-border rounded-2xl p-4">
             <Text className="text-ink-muted text-sm">
-              Nenhum conteúdo encontrado para este filtro.
+              {faseFiltro == null
+                ? 'Você ainda não favoritou nenhum conteúdo. Favorite na aba Conteúdos.'
+                : 'Nenhum conteúdo encontrado para este filtro.'}
             </Text>
           </View>
         ) : (

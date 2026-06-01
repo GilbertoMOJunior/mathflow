@@ -15,6 +15,7 @@ const fases = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 export default function ConteudosScreen() {
   const registros = useAppStore((s) => s.registros);
   const favoritos = useAppStore((s) => s.favoritos);
+  const interesses = useAppStore((s) => s.interesses);
   const toggleFavorito = useAppStore((s) => s.toggleFavorito);
   const [faseFiltro, setFaseFiltro] = useState<number | null>(null);
   const [minimizadas, setMinimizadas] = useState<Set<string>>(new Set());
@@ -38,9 +39,13 @@ export default function ConteudosScreen() {
   const favoritosSet = useMemo(() => new Set(favoritos), [favoritos]);
 
   const disciplinasFiltradas = useMemo(() => {
-    if (faseFiltro == null) return grade;
+    if (faseFiltro == null) {
+      return interesses.length > 0
+        ? grade.filter((d) => interesses.includes(d.id))
+        : grade;
+    }
     return grade.filter((d) => d.fase === faseFiltro);
-  }, [faseFiltro]);
+  }, [faseFiltro, interesses]);
 
   return (
     <SafeAreaView className="flex-1 bg-surface-muted" edges={['top']}>
@@ -64,7 +69,7 @@ export default function ConteudosScreen() {
           <Chip
             ativo={faseFiltro === null}
             onPress={() => setFaseFiltro(null)}
-            label="Todas"
+            label="Ativas"
           />
           {fases.map((f) => (
             <Chip
@@ -85,7 +90,9 @@ export default function ConteudosScreen() {
         {disciplinasFiltradas.length === 0 ? (
           <View className="bg-white border border-surface-border rounded-2xl p-4">
             <Text className="text-ink-muted text-sm">
-              Nenhuma disciplina nesta fase.
+              {faseFiltro == null
+                ? 'Nenhuma matéria ativa. Ajuste suas matérias no Perfil.'
+                : 'Nenhuma disciplina nesta fase.'}
             </Text>
           </View>
         ) : (

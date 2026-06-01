@@ -22,6 +22,7 @@ type ResumoTrilha = {
 export default function TrilhasScreen() {
   const registros = useAppStore((s) => s.registros);
   const trilhas = useAppStore((s) => s.trilhas);
+  const interesses = useAppStore((s) => s.interesses);
   const [faseMateria, setFaseMateria] = useState<number | null>(null);
 
   const statusPorConteudo = useMemo(() => {
@@ -35,7 +36,9 @@ export default function TrilhasScreen() {
   const trilhasMateria: ResumoTrilha[] = useMemo(() => {
     const disciplinas =
       faseMateria == null
-        ? grade
+        ? interesses.length > 0
+          ? grade.filter((d) => interesses.includes(d.id))
+          : grade
         : grade.filter((d) => d.fase === faseMateria);
     return disciplinas.map((d) => {
       const cards = d.conteudos.reduce((s, c) => s + c.flashcards.length, 0);
@@ -52,7 +55,7 @@ export default function TrilhasScreen() {
         custom: false,
       };
     });
-  }, [statusPorConteudo, faseMateria]);
+  }, [statusPorConteudo, faseMateria, interesses]);
 
   const trilhasCustom: ResumoTrilha[] = useMemo(() => {
     return trilhas.map((t) => {
@@ -140,7 +143,7 @@ export default function TrilhasScreen() {
             <Chip
               ativo={faseMateria === null}
               onPress={() => setFaseMateria(null)}
-              label="Todas"
+              label="Ativas"
             />
             {fases.map((f) => (
               <Chip
@@ -156,7 +159,9 @@ export default function TrilhasScreen() {
           {trilhasMateria.length === 0 ? (
             <View className="bg-white border border-surface-border rounded-2xl p-4">
               <Text className="text-ink-muted text-sm">
-                Nenhuma matéria nesta fase.
+                {faseMateria == null
+                  ? 'Nenhuma matéria ativa. Ajuste suas matérias no Perfil.'
+                  : 'Nenhuma matéria nesta fase.'}
               </Text>
             </View>
           ) : (
