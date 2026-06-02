@@ -3,7 +3,7 @@
     "name": "MathFlow",
     "slug": "mathflow",
     "version": "1.0.1",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "scheme": "mathflow",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
