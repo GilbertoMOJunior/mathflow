@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>UniDrive — Demonstração</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root {
+      --primary: #185FA5;
+      --primary-50: #EDF4FC;
+      --ink: #111827;
+      --ink-muted: #6B7280;
+      --border: #E5E7EB;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 50% -10%, #EAF2FB 0%, #F4F5F7 55%, #EEF0F3 100%);
+      color: var(--ink);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 1040px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 48px;
+      align-items: center;
+    }
+    /* ---- Painel de informações ---- */
+    .panel { max-width: 420px; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+    .brand .logo {
+      width: 44px; height: 44px; border-radius: 12px; background: var(--primary);
+      color: #fff; font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: center;
+    }
+    .brand .name { font-size: 18px; font-weight: 600; line-height: 1.1; }
+    .brand .sub { font-size: 12px; color: var(--ink-muted); }
+    h1 { font-size: 30px; line-height: 1.15; font-weight: 700; letter-spacing: -0.5px; }
+    h1 .accent { color: var(--primary); }
+    .lead { margin-top: 14px; font-size: 15px; line-height: 1.6; color: var(--ink-muted); }
+    .actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 18px; border-radius: 12px; font-size: 15px; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: 1px solid transparent; transition: .15s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: #134d86; }
+    .btn-ghost { background: #fff; color: var(--primary); border-color: var(--border); }
+    .btn-ghost:hover { border-color: var(--primary); }
+    .qr {
+      margin-top: 26px; display: flex; align-items: center; gap: 14px;
+      background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px;
+    }
+    .qr img { width: 96px; height: 96px; border-radius: 8px; }
+    .qr .qr-txt { font-size: 13px; color: var(--ink-muted); line-height: 1.45; }
+    .qr .qr-txt strong { color: var(--ink); display: block; font-size: 14px; margin-bottom: 2px; }
+    .hint { margin-top: 18px; font-size: 12.5px; color: var(--ink-light, #9CA3AF); line-height: 1.5; }
+    /* ---- Moldura do celular ---- */
+    .phone-col { display: flex; justify-content: center; }
+    .phone {
+      position: relative;
+      width: 340px; height: 720px;
+      background: #0c0c0e;
+      border-radius: 46px;
+      padding: 12px;
+      box-shadow: 0 30px 70px -20px rgba(16,40,72,.45), 0 8px 24px -12px rgba(0,0,0,.3);
+    }
+    .phone::after { /* notch */
+      content: ""; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 24px; background: #0c0c0e; border-radius: 0 0 16px 16px; z-index: 3;
+    }
+    .screen {
+      position: relative; width: 100%; height: 100%;
+      border-radius: 36px; overflow: hidden; background: #F4F5F7;
+    }
+    .screen iframe { width: 100%; height: 100%; border: 0; display: block; }
+    @media (max-width: 880px) {
+      .wrap { grid-template-columns: 1fr; gap: 32px; justify-items: center; text-align: center; }
+      .panel { order: 1; }
+      .phone-col { order: 2; }
+      .brand, .actions { align-items: center; justify-content: center; }
+      .qr { text-align: left; }
+      .phone { transform: scale(.92); }
+    }
+    @media (max-width: 420px) {
+      .phone { width: 300px; height: 640px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="brand">
+        <div class="logo">U</div>
+        <div>
+          <div class="name">UniDrive</div>
+          <div class="sub">Flashcards · Matemática Uniplac</div>
+        </div>
+      </div>
+      <h1>Estude do jeito <span class="accent">Anki</span>, direto no navegador.</h1>
+      <p class="lead">
+        App de flashcards com estudo espaçado para os alunos do curso de Matemática.
+        Esta é a versão real do aplicativo rodando na web — teste todas as funcionalidades
+        sem instalar nada.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="{{APP_URL}}" target="_blank" rel="noopener">📱 Abrir o app em tela cheia</a>
+        <a class="btn btn-ghost" href="{{DASHBOARD_URL}}" target="_blank" rel="noopener">📊 Painel do Professor</a>
+      </div>
+      <div class="qr">
+        <img src="{{QR}}" alt="QR code para abrir o app" />
+        <div class="qr-txt">
+          <strong>Abra no seu celular</strong>
+          Escaneie o código para abrir o app em tela cheia no seu próprio aparelho (iOS/Android).
+        </div>
+      </div>
+      <p class="hint">
+        Dica: na primeira tela, informe um nome e uma <strong>matrícula de 6 dígitos</strong> para começar.
+        As sessões de estudo aparecem em tempo real no Painel do Professor.
+      </p>
+    </div>
+
+    <div class="phone-col">
+      <div class="phone">
+        <div class="screen">
+          <iframe src="{{APP_URL}}" title="UniDrive" allow="clipboard-write"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

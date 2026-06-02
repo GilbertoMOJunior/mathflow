@@ -1,4 +1,4 @@
-# MathFlow
+# UniDrive
 
 App mobile de flashcards para alunos do curso de Matemática da Uniplac (Universidade do Planalto Catarinense, Lages/SC). Metodologia: estudo espaçado no estilo Anki.
 
@@ -120,4 +120,4 @@ Grade oficial do curso de Matemática da Uniplac (8 fases). Disciplinas e conte�
 
 ## Repositório
 
-GitHub: https://github.com/GilbertoMOJunior/mathflow (público, branch `main`)
+GitHub: https://github.com/GilbertoMOJunior/UniDriveApp (público, branch `main`)

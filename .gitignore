@@ -2,6 +2,7 @@ node_modules/
 .expo/
 .expo-shared/
 dist/
+demo-dist/
 web-build/
 .expo-export/
 

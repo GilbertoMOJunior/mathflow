@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "MathFlow",
-    "slug": "mathflow",
+    "name": "UniDrive",
+    "slug": "unidrive",
     "version": "1.0.1",
     "orientation": "default",
-    "scheme": "mathflow",
+    "scheme": "unidrive",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
@@ -18,7 +18,8 @@
       "package": "br.edu.uniplac.mathflow"
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "output": "single"
     },
     "plugins": [
       "expo-router",

@@ -33,9 +33,9 @@ export default function IdentificarScreen() {
         <View className="flex-1 justify-center py-10">
           <View className="items-center mb-8">
             <View className="w-16 h-16 rounded-2xl bg-primary items-center justify-center">
-              <Text className="text-white text-2xl font-title">M</Text>
+              <Text className="text-white text-2xl font-title">U</Text>
             </View>
-            <Text className="text-ink text-2xl font-title mt-4">Bem-vindo ao MathFlow</Text>
+            <Text className="text-ink text-2xl font-title mt-4">Bem-vindo ao UniDrive</Text>
             <Text className="text-ink-muted text-sm mt-1 text-center">
               Identifique-se para acompanharmos seu progresso.
             </Text>

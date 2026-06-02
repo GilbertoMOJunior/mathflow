@@ -1,4 +1,4 @@
-# MathFlow — Como rodar localmente
+# UniDrive — Como rodar localmente
 
 App mobile de flashcards (Anki-style) para o curso de Matemática da Uniplac.
 Stack: Expo SDK 54 + React Native 0.81 + TypeScript + NativeWind.
@@ -58,8 +58,8 @@ npm --version     # deve mostrar 10.x.x
 Abra o terminal numa pasta onde você queira guardar o código (ex: `Documentos`):
 
 ```bash
-git clone https://github.com/GilbertoMOJunior/mathflow.git
-cd mathflow
+git clone https://github.com/GilbertoMOJunior/UniDriveApp.git
+cd UniDriveApp
 ```
 
 ---
