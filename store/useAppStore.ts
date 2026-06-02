@@ -2,11 +2,14 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { RegistroEstudo } from '../data/grade';
+import { pushRegistro } from '../lib/sync';
 
 type Usuario = {
   id: string;
   nome: string;
   fase: number;
+  // Definida na tela de identificação. Quando ausente, o app pede o cadastro.
+  matricula?: string;
 };
 
 export type TrilhaCustom = {
@@ -49,7 +52,7 @@ const uid = () =>
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       usuario: {
         id: 'u-eu',
         nome: 'Estudante Uniplac',
@@ -105,18 +108,19 @@ export const useAppStore = create<AppState>()(
             t.id === id ? { ...t, ...patch } : t,
           ),
         })),
-      addRegistro: (registro) =>
-        set((state) => ({
-          registros: [
-            {
-              ...registro,
-              id: uid(),
-              userId: state.usuario.id,
-              timestamp: new Date().toISOString(),
-            },
-            ...state.registros,
-          ],
-        })),
+      addRegistro: (registro) => {
+        const { usuario } = get();
+        const matricula = usuario.matricula ?? usuario.id;
+        const novo: RegistroEstudo = {
+          ...registro,
+          id: uid(),
+          userId: matricula,
+          timestamp: new Date().toISOString(),
+        };
+        set((state) => ({ registros: [novo, ...state.registros] }));
+        // Espelha no Supabase (best-effort). Só quando há matrícula real.
+        if (usuario.matricula) void pushRegistro(usuario.matricula, novo);
+      },
       addChatMensagem: (conteudoId, msg) =>
         set((state) => {
           const atual = state.chatHistorico[conteudoId] ?? [];
